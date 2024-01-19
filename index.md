@@ -2,7 +2,7 @@
 
 Chào mừng bạn, tân coder đã đến với nhóm tụi mình.
 
-Đây là một trang wiki tụi mình lập ra nhằm giải quyết thắc mắc dành cho các bạn tân coder mới tham gia [dự án của chúng mình](https://github.com/saocodon/game). Chúng mình là một nhóm nhỏ, với hai thành viên là chủ chốt của dự án này.
+Đây là một trang wiki tụi mình lập ra nhằm giải quyết thắc mắc dành cho các bạn tân coder mới tham gia [dự án của chúng mình](https://github.com/Team-BigDy/game). Chúng mình là một nhóm nhỏ, với hai thành viên là chủ chốt của dự án này.
 
 Dự án này sẽ là một game nhập vai (RPG) nhỏ, đồ hoạ 2D, được viết hoàn toàn bằng C++ cùng thư viện [SDL2](https://github.com/libsdl-org/SDL/releases) mà không dùng bất cứ phần mềm làm game nào. Là những người trẻ thơ dại, chúng mình cũng là tay mơ trong ngành game gủng, nhưng cũng nuôi hi vọng rằng đây sẽ là một trải nghiệm quý giá với tất cả những ai tham gia.
 
@@ -17,7 +17,7 @@ Code này được tham khảo từ [series này](https://www.youtube.com/playli
 ### Phần 1: Engine
 - [Hàm main](p1/main-function.md)
 - [Lớp Game và tổng quan code](p1/game.md)
-- Đây chắc là phần dễ nhất của cái code, nó chỉ có một hàm duy nhất: `LoadTexture()` dùng để load hình ảnh lên màn hình. Chỉ có một file [texture_manager.hpp](https://github.com/saocodon/game/blob/main/core/texture_manager.hpp), tự đọc nhé :)
+- [Lớp TextureManager](https://github.com/Team-BigDy/game/blob/main/core/texture_manager.hpp), tự đọc nhé :)
 - [Hệ thống quản lí dữ liệu Entity-Component-System (ECS)](p1/ecs.md)
 - [Xử lí bàn phím](p1/keyboard.md)
 - [Phát hiện va chạm](p1/collision.md)

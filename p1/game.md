@@ -38,7 +38,7 @@ private:
 - `#pragma once`: còn gọi là include guard, có tác dụng bảo vệ các file được include sao cho các file header `.hpp` chỉ được include đúng 1 lần duy nhất. Nếu được include từ 2 lần trở lên, những gì được định nghĩa trong file đó cũng được định nghĩa 2 lần, gây ra lỗi linker.
 - Hàm tạo, hàm huỷ: hiện tại ta chưa xét tới nó.
 - Các hàm:
-	- `init(title, x, y, w, h, flags)`: khởi tạo cửa sổ bằng cách khởi tạo cho các con trỏ `*window`, `*renderer`, khởi động hệ thống SDL và vẽ cửa sổ. `title` là tên cửa sổ, `x`, `y`, `w`, `h` lần lượt là toạ độ và kích cỡ cửa sổ, `flags` là các tham số đi kèm, có thể tham khảo tại [SDL Wiki](https://wiki.libsdl.org/SDL2/SDL_CreateWindow) và [main.cpp](https://github.com/saocodon/game/blob/main/core/game.cpp)
+	- `init(title, x, y, w, h, flags)`: khởi tạo cửa sổ bằng cách khởi tạo cho các con trỏ `*window`, `*renderer`, khởi động hệ thống SDL và vẽ cửa sổ. `title` là tên cửa sổ, `x`, `y`, `w`, `h` lần lượt là toạ độ và kích cỡ cửa sổ, `flags` là các tham số đi kèm, có thể tham khảo tại [SDL Wiki](https://wiki.libsdl.org/SDL2/SDL_CreateWindow) và [main.cpp](https://github.com/Team-BigDy/game/blob/main/core/game.cpp)
 	- `isRunning()`: vì `isRunning` là biến `private` nên để chặn hàm while ở `main.cpp` ta cần lấy ra được biến này.
 	- Các hàm kia khá là dễ hiểu, đọc file `game.cpp` là hiểu liền, tự đọc nhé :)
 - Các biến:
@@ -47,4 +47,4 @@ private:
 
 ## Tổng quan code
 
-Biểu đồ class...
+Biểu đồ class coming soon...

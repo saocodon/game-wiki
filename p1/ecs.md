@@ -370,7 +370,7 @@ struct TransformComponent {
 
 Rồi đến system, mình có một system là để quản lí animation (code cũng không quá khó hiểu) và một system khác để quản lí vị trí (movement). `AnimationSystem` là để quản lí sprites, animation, render; `MovementSystem` quản lí vị trí. Cả hai đều có hàm `update()`, nhưng `render()` thì để `AnimationSystem` lo, ta chỉ cần đặt các hàm này vào đúng chỗ trong class `Game` là được.
 
-[animation_system.hpp](https://github.com/saocodon/game/blob/main/sys/animation_system.hpp)
-[movement_system.hpp](https://github.com/saocodon/game/blob/main/sys/movement_system.hpp)
+[animation_system.hpp](https://github.com/Team-BigDy/game/blob/main/sys/animation_system.hpp)
+[movement_system.hpp](https://github.com/Team-BigDy/game/blob/main/sys/movement_system.hpp)
 
 Voilà, xong rồi!
