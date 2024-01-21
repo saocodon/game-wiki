@@ -1,5 +1,8 @@
 # Lớp `Game` và tổng quan code
 
+>✏️ [saocodon](https://github.com/saocodon)
+>⌛ 18/1/24
+
 ## Lớp Game
 
 Để quản lí đối tượng dễ dàng hơn, đồng thời có thể thêm bất cứ thứ gì ngoài các sự kiện của game ở file chính, mình tạo ra một class `Game` mới.

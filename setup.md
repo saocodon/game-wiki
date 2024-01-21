@@ -1,5 +1,8 @@
 # Cài đặt môi trường
 
+>✏️ [saocodon](https://github.com/saocodon)
+>⌛ 18/1/24
+
 Chúng mình dùng Visual Studio 2022 để code game này :)
 
 1. Tải những thư viện sau về (bản VC):

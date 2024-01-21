@@ -1,5 +1,8 @@
 # Hàm main
 
+>✏️ [saocodon](https://github.com/saocodon)
+>⌛ 18/1/24
+
 Mỗi khi bạn làm việc với một dự án lớn không biết đọc code từ đâu, gợi ý cho bạn là việc đầu tiên là phải đọc hàm `main(int argc, char* argv[])`, vì đó là nơi bắt đầu của code. Các tham số `argc` và `argv` chính là tham số truyền vào khi chạy game từ CLI.
 
 ```cpp

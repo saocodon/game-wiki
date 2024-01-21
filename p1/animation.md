@@ -1,5 +1,8 @@
 # Animation và lật sprite
 
+>✏️ [saocodon](https://github.com/saocodon)
+>⌛ 18/1/24
+
 Bài này sẽ ngắn thôi, vì animation chỉ là sự tiến hoá của component `SpriteComponent`.
 
 Bản chất là `SpriteComponent` chứa một `SDL_Texture*` có chứa hình ảnh ta đã nạp vào thông qua `TextureManager`, vì vậy khi chạy nó sẽ tạo ra một hình ảnh trên màn hình. Bây giờ, nếu muốn nhân vật chuyển động, ta cần tạo ra một vài frame cho nó, sau đó lặp đi lặp lại. Ở đây mình cho thẳng

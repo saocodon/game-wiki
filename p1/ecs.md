@@ -1,6 +1,9 @@
 # Entity-Component-System (ECS)
 
-Đây sẽ là phần khó nhất của code. Chúc may mắn =))
+>✏️ [saocodon](https://github.com/saocodon)
+>⌛ 21/1/24
+
+>Đây sẽ là phần khó nhất của code. Chúc may mắn =))
 
 ## Nếu nó khó vậy, tại sao lại sinh ra cái của nợ này?
 Đều là chất xám con người cả đấy. Giả sử mình có một class `Human` -> class `Player`, `Villager` và có một class `NonHuman` -> class `Monster` chẳng hạn (`->` tạm thời kí hiệu là thừa kế). Bây giờ nếu mình muốn tạo ra một con zombie (class `Zombie`) thì rõ ràng là zombie vừa là người vừa không phải người, nhìn cái cây thừa kế đã thấy lỏ lỏ rồi =))
@@ -372,5 +375,54 @@ Rồi đến system, mình có một system là để quản lí animation (code
 
 [animation_system.hpp](https://github.com/Team-BigDy/game/blob/main/sys/animation_system.hpp)
 [movement_system.hpp](https://github.com/Team-BigDy/game/blob/main/sys/movement_system.hpp)
+
+Bây giờ xem cách sử dụng nhé:
+
+Khai báo `game_manager` ở `game.cpp`, các file `.hpp` còn lại ta dùng `extern`. Có một số dòng liên quan đến lật sprite thì các bạn tham khảo ở [đây](animation.md) nhé.
+
+```cpp
+Coordinator game_manager;
+
+void Game::init(const char* title, int x, int y, int w, int h, int flags) {
+	// Do work here
+	game_manager.init();
+	game_manager.registerComponent<TransformComponent>();
+	game_manager.registerComponent<SpriteComponent>();
+	movementSystem = game_manager.registerSystem<MovementSystem>();
+	animationSystem = game_manager.registerSystem<AnimationSystem>();
+	keyboardSystem = game_manager.registerSystem<KeyboardSystem>();
+	Signature signature;
+
+	// include components into systems
+	signature.set(game_manager.getComponentType<TransformComponent>());
+	signature.set(game_manager.getComponentType<SpriteComponent>());
+	game_manager.setSystemSignature<AnimationSystem>(signature);
+	signature.reset(game_manager.getComponentType<SpriteComponent>());
+	game_manager.setSystemSignature<MovementSystem>(signature);
+
+	// get ID for player
+	player = game_manager.createEntity();
+	// TODO adapt Sprite component
+	SDL_Rect dstR; dstR.w = dstR.h = 64; dstR.x = dstR.y = 50;
+	SDL_Texture* t = TextureManager::LoadTexture("assets/player2.png", renderer);
+	std::vector<SDL_Rect> animRects = {
+		SDL_Rect{ 0, 0, 85, 169 },
+		SDL_Rect{ 91, 0, 90, 169 },
+		SDL_Rect{ 187, 0, 97, 169 },
+		SDL_Rect{ 290, 0, 108, 169 },
+		SDL_Rect{ 404, 0, 96, 175 }
+	};
+	game_manager.addComponent(player, SpriteComponent{ t, animRects, 0, 130, true, SDL_FLIP_NONE });
+	game_manager.addComponent(player, TransformComponent{ Vec(50, 50), Vec(0, 0) });
+}
+```
+
+- Về cơ bản:
+	- Ta khởi tạo `game_manager`.
+	- Đăng kí các component của mình.
+	- Đăng kí system.
+	- Đặt signature cho system.
+	- Khởi tạo entity và dữ liệu.
+	- Dùng `addComponent` để thêm dữ liệu vào entity.
 
 Voilà, xong rồi!

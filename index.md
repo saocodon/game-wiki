@@ -17,7 +17,7 @@ Code này được tham khảo từ [series này](https://www.youtube.com/playli
 ### Phần 1: Engine
 - [Hàm main](p1/main-function.md)
 - [Lớp Game và tổng quan code](p1/game.md)
-- [Lớp TextureManager](https://github.com/Team-BigDy/game/blob/main/core/texture_manager.hpp), tự đọc nhé :)
+- [Lớp TextureManager](https://github.com/Team-BigDy/game/blob/main/core/texture_manager.hpp)
 - [Hệ thống quản lí dữ liệu Entity-Component-System (ECS)](p1/ecs.md)
 - [Xử lí bàn phím](p1/keyboard.md)
 - [Phát hiện va chạm](p1/collision.md)
