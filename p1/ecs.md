@@ -415,6 +415,19 @@ void Game::init(const char* title, int x, int y, int w, int h, int flags) {
 	game_manager.addComponent(player, SpriteComponent{ t, animRects, 0, 130, true, SDL_FLIP_NONE });
 	game_manager.addComponent(player, TransformComponent{ Vec(50, 50), Vec(0, 0) });
 }
+
+void Game::update() {
+	animationSystem->update();
+	keyboardSystem->update(ev);
+	movementSystem->update(ev);
+}
+
+void Game::render() {
+	SDL_RenderClear(renderer);
+	// this is where we would add stuff to render
+	animationSystem->render(renderer);
+	SDL_RenderPresent(renderer);
+}
 ```
 
 - Về cơ bản:
