@@ -49,5 +49,7 @@ private:
 	- `entity player`: mình tạo demo thôi :) `entity` đã được định nghĩa bằng `std::uint32_t` trong `const.hpp`, bản chất nó chỉ là một cái ID của entity trong game thôi :)
 
 ## Tổng quan code
-
-Biểu đồ class coming soon...
+### Biểu đồ include
+<p align="center">
+  <img src="img/classes.png" />
+</p>

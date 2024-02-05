@@ -1,9 +1,10 @@
 # Entity-Component-System (ECS)
 
 >✏️ [saocodon](https://github.com/saocodon)
->⌛ 21/1/24
+>⌛ 5/2/24
 
 >Đây sẽ là phần khó nhất của code. Chúc may mắn =))
+>[cynmeiciel](https://github.com/cynmeiciel) đã góp ý rằng nên tách các lớp ra thành 2 file `*.cpp` và `*.hpp` nên mình đã viết lại chỗ code này.
 
 ## Nếu nó khó vậy, tại sao lại sinh ra cái của nợ này?
 Đều là chất xám con người cả đấy. Giả sử mình có một class `Human` -> class `Player`, `Villager` và có một class `NonHuman` -> class `Monster` chẳng hạn (`->` tạm thời kí hiệu là thừa kế). Bây giờ nếu mình muốn tạo ra một con zombie (class `Zombie`) thì rõ ràng là zombie vừa là người vừa không phải người, nhìn cái cây thừa kế đã thấy lỏ lỏ rồi =))
@@ -38,41 +39,9 @@ const int MAX_COMPONENTS = 32;
 
 Một entity chủ yếu chỉ có hai thuộc tính đó, vì vậy bây giờ ta sẽ tạo một class manager cho nó.
 
-```cpp
-#pragma once
+[entity_manager.hpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/entity_manager.hpp)
+[entity_manager.cpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/entity_manager.cpp)
 
-#include "const.hpp"
-#include <queue>
-#include <assert.h>
-
-class EntityManager {
-private:
-	std::queue<entity> ID;
-	std::array<Signature, MAX_ENTITIES> signatures;
-public:
-	EntityManager() {
-		for (entity e = 0; e < MAX_ENTITIES; e++)
-			ID.push(e);
-	}
-	entity createEntity() {
-		assert(!ID.empty() && "Entity count reached maximum");
-		entity id = ID.front(); ID.pop();
-		return id;
-	}
-	void destroyEntity(entity e) {
-		assert(e < MAX_ENTITIES && "EntityManager::destroyEntity(): out of range");
-		signatures[e] = 0;
-		ID.push(e);
-	}
-	void setSignature(entity e, Signature signature) {
-		signatures[e] = signature;
-	}
-	Signature getSignature(entity e) {
-		assert(e < MAX_ENTITIES && "EntityManager::getSignature(): out of range");
-		return signatures[e];
-	}
-};
-```
 - Giải thích code sương sương:
 	- `EntityManager()`: Đầu tiên, khi khởi tạo manager mình sẽ tạo một cái queue, lúc đầu mình sẽ thêm toàn bộ 5000 cái ID vào đó, là 5000 cái ID này coi như khả dụng, chưa có cái entity nào xài. Với mỗi entity tạo ra mình sẽ lấy cái ID ở đầu queue đặt cho nó, coi như là ID đó đã được xài, mình xoá cái ID đó ra khỏi queue. Rồi tới lúc một entity nào đó bị xoá mình lại thêm nó vào cái queue này, cứ vậy cho tới chừng nào vượt quá `MAX_ENTITIES` thì mình sẽ báo lỗi bằng hàm `assert()`.
 	- `createEntity()`: trả về 1 ID cho entity mới. Nếu đã chạm mốc `MAX_ENTITIES` thì báo lỗi.
@@ -89,58 +58,8 @@ public:
 	- Vì mảng này là một mảng đặc biệt (nó có các tính năng đặc biệt kể trên), ta sẽ tách nó ra thành một class (gọi là `ComponentArray`), và vì ta không thể biết được số lượng `ComponentArray` đang tồn tại, nó phụ thuộc vào số component ta tạo ra (nhưng chẳng lẽ mỗi lần tạo một component là quay vào cái code này sửa lại?), vì thế ta sẽ tạo một lớp cơ sở trừu tượng `IComponentArray`. Lớp này sẽ được thừa kế bởi `ComponentArray`, ta sẽ không dùng tới lớp này để khai báo đối tượng mà chỉ dùng để điều khiển đám `ComponentArray` thôi.
 - Chi tiết các bạn có thể đọc tại [đây](https://austinmorlan.com/posts/entity_component_system/).
 
-```cpp
-#pragma once
-
-#include "const.hpp"
-#include <array>
-#include <unordered_map>
-#include <assert.h>
-
-class IComponentArray {
-public:
-	virtual ~IComponentArray() = default;
-	virtual void entityDestroyed(entity e) = 0;
-};
-
-template<typename T>
-class ComponentArray : public IComponentArray {
-private:
-	// just a wrapper of original arrays
-	std::array<T, MAX_ENTITIES> componentArray;
-	// better than arrays because search time is O(1)
-	std::unordered_map<entity, size_t> entityToIndex;
-	size_t arraySize;
-public:
-	void insertData(entity e, T component) {
-		assert(entityToIndex.find(e) == entityToIndex.end() && "Component of entity existed");
-		size_t newIndex = arraySize;
-		entityToIndex[e] = newIndex;
-		componentArray[newIndex] = component;
-		++arraySize;
-	}
-	void removeData(entity e) {
-		assert(entityToIndex.find(e) != entityToIndex.end() && "Removing non-existent component");
-		// copy element at end into the place of the deleted element to maintain density
-		size_t indexOfRemovedElement = entityToIndex[e];
-		componentArray[indexOfRemovedElement] = componentArray[arraySize - 1];
-		// update map
-		entityToIndex[arraySize - 1] = indexOfRemovedElement; // TODO?
-		entityToIndex.erase(e);
-		--arraySize;
-	}
-	T& getData(entity e) {
-		assert(entityToIndex.find(e) != entityToIndex.end() && "Retrieving non-existent component");
-		// return entityToIndex[e]-th element of type T of componentArray[]
-		return componentArray[entityToIndex[e]];
-	}
-	// redefining virtual method
-	void entityDestroyed(entity e) override {
-		if (entityToIndex.find(e) != entityToIndex.end())
-			removeData(e);
-	}
-};
-```
+[component_array.hpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/component_array.hpp)
+[component_array.cpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/component_array.cpp)
 
 ### Component Manager
 - Xong cái đám array component đó rồi, giờ ta cần phải quản lí nó. Để việc quản lí thuận tiện ta lại tạo thêm một class mới làm manager. Nó sẽ có các nhiệm vụ như sau:
@@ -152,60 +71,9 @@ public:
 	- Một map khác chứa key: mã `T`, value: con trỏ trỏ đến `ComponentArray<T>`.
 - Một số từ khoá: `std::make_shared`, `std::static_pointer_cast`.
 
-```cpp
-#pragma once
+[component_manager.hpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/component_manager.hpp)
+[component_manager.cpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/component_manager.cpp)
 
-#include "component_array.hpp"
-#include <memory>
-
-class ComponentManager {
-public:
-	template<typename T>
-	void registerComponent() {
-		const char* typeName = typeid(T).name();
-		assert(componentTypes.find(typeName) == componentTypes.end() && "Registering component type more than once.");
-		componentTypes.insert({ typeName, nextComponentType });
-		// create a ComponentArray shared pointer & add it to the component arrays map
-		componentArrays.insert({ typeName, std::make_shared < ComponentArray<T>>() });
-		++nextComponentType;
-	}
-	template<typename T>
-	componentType getComponentType() {
-		const char* typeName = typeid(T).name();
-		assert(componentTypes.find(typeName) != componentTypes.end() && "Component not registered before use");
-		return componentTypes[typeName];
-	}
-	template<typename T>
-	void addComponent(entity e, T component) {
-		getComponentArray<T>()->insertData(e, component);
-	}
-	template<typename T>
-	void removeComponent(entity e) {
-		getComponentArray<T>()->removeData(e);
-	}
-	template<typename T>
-	T& getComponent(entity e) {
-		return getComponentArray<T>()->getData(e);
-	}
-	void entityDestroyed(entity e) {
-		for (auto const& pair : componentArrays) {
-			auto const& component = pair.second;
-			component->entityDestroyed(e);
-		}
-	}
-private:
-	std::unordered_map<const char*, componentType> componentTypes;
-	std::unordered_map<const char*, std::shared_ptr<IComponentArray>> componentArrays;
-	componentType nextComponentType; // counter (setting IDs for components)
-	template <typename T>
-	std::shared_ptr<ComponentArray<T>> getComponentArray() {
-		const char* typeName = typeid(T).name();
-		assert(componentTypes.find(typeName) != componentTypes.end() && "Component not registered before use");
-		// return pointer of type IComponentArray
-		return std::static_pointer_cast<ComponentArray<T>>(componentArrays[typeName]);
-	}
-};
-```
 ### System và System Manager
 Gần xong rồi, cố lên.
 
@@ -215,131 +83,24 @@ Bây giờ ta đã có được entity và component, được quản lí đầy
 	- `SetSignature(Signature signature)`: vì một system chỉ quản lí một vài component (tương đương một vài bit trong bitset), nên các system cũng có signature riêng, với bit 1 thì nó sẽ quản lí component đó, bit 0 thì không quản lí.
 	- `EntitySignatureChanged(entity e, Signature entitySignature)`: khi một entity thay đổi signature (mất/thêm một vài component), có thể một số system sẽ không quản lí nó nữa, có thể một số system mới sẽ bắt đầu quản lí nó. Hàm này sẽ loop qua toàn bộ các system, kiểm tra rằng nếu `entitySignature & systemSignature == systemSignature` (`systemSignature < entitySignature` là cái chắc, vì nó chỉ quản lí một số component, chắc chắn rằng entity có nhiều component hơn như vậy). Nếu điều kiện đúng, system giữ lại entity, sai thì nó xoá entity ra khỏi danh sách của nó.
 
-```cpp
-#pragma once
+[system_manager.hpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/system_manager.hpp)
+[system_manager.cpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/system_manager.cpp)
 
-#include "const.hpp"
-#include <set>
-#include <unordered_map>
-#include <memory>
-#include <iostream>
-
-class System {
-public:
-	std::set<entity> entities;
-};
-
-class SystemManager {
-private:
-	std::unordered_map<const char*, Signature> signatures;
-	std::unordered_map<const char*, std::shared_ptr<System>> systems;
-public:
-	template<typename T>
-	std::shared_ptr<T> registerSystem() {
-		const char* typeName = typeid(T).name();
-		assert(systems.find(typeName) == systems.end() && "Registering system more than once");
-		auto system = std::make_shared<T>();
-		systems.insert({ typeName, system });
-		return system;
-	}
-
-	template<typename T>
-	void setSignature(Signature signature) {
-		const char* typeName = typeid(T).name();
-		assert(systems.find(typeName) != systems.end() && "System used before registered");
-		signatures.insert({ typeName, signature });
-	}
-
-	void entityDestroyed(entity e) {
-		for (auto const& pair : systems) {
-			auto const& system = pair.second;
-			system->entities.erase(e);
-		}
-	}
-
-	void entitySignatureChanged(entity e, Signature signature) {
-		for (auto const& pair : systems) {
-			auto const& type = pair.first;
-			auto const& system = pair.second;
-			auto const& systemSignature = signatures[type];
-			// checking if system manages entity (systemSignature < signature)
-			if ((signature & systemSignature) == systemSignature) {
-				system->entities.insert(e);
-			}
-			else {
-				system->entities.erase(e);
-			}
-		}
-	}
-};
-```
 ### Bước cuối cùng
 Ba hệ thống Entity-Component-System đã hoàn thành, nhưng vấn đề là nó chưa thể giao tiếp với nhau được. Ta cần chúng hoạt động cùng nhau để quản lí dữ liệu, vì thế ta tạo thêm một class nữa gọi là `Coordinator` (hết tên đặt :)))
 
 Class này cũng dễ nên chắc mình không cần giải thích đâu nhỉ.
 
+[coordinator.hpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/coordinator.hpp)
+[coordinator.cpp](https://github.com/Team-BigDy/game/blob/main/core/ecs/coordinator.cpp)
+
+Đến đây, vì một số lý do liên quan đến hàm template, nên mình tách riêng một file [coordinator.inl](https://github.com/Team-BigDy/game/blob/main/core/ecs/coordinator.inl) chỉ để chứa các hàm có template:
+
+Sau đó thêm 1 dòng cuối ở `coordinator.hpp`:
 ```cpp
-#pragma once
+// ...
 
-#include "component_manager.hpp"
-#include "system_manager.hpp"
-#include "entity_manager.hpp"
-
-class Coordinator {
-private:
-	std::unique_ptr<ComponentManager> componentManager;
-	std::unique_ptr<EntityManager> entityManager;
-	std::unique_ptr<SystemManager> systemManager;
-public:
-	void init() {
-		// create unique pointers to each manager
-		componentManager = std::make_unique<ComponentManager>();
-		entityManager = std::make_unique<EntityManager>();
-		systemManager = std::make_unique<SystemManager>();
-	}
-	entity createEntity() {
-		return entityManager->createEntity();
-	}
-	void destroyEntity(entity e) {
-		entityManager->destroyEntity(e);
-		componentManager->entityDestroyed(e);
-		systemManager->entityDestroyed(e);
-	}
-	// component methods
-	template <typename T>
-	void registerComponent() {
-		componentManager->registerComponent<T>();
-	}
-	template <typename T>
-	void addComponent(entity e, T component) {
-		componentManager->addComponent(e, component);
-		auto signature = entityManager->getSignature(e);
-		// set property: componentManager->getComponentType() of type T
-		signature.set(componentManager->getComponentType<T>(), true);
-		entityManager->setSignature(e, signature);
-		// called when add a component
-		systemManager->entitySignatureChanged(e, signature);
-	}
-	template <typename T>
-	T& getComponent(entity e) {
-		// get all components of e
-		return componentManager->getComponent<T>(e);
-	}
-	template <typename T>
-	componentType getComponentType() {
-		// get ID for component type T
-		return componentManager->getComponentType<T>();
-	}
-	// system methods
-	template <typename T>
-	std::shared_ptr<T> registerSystem() {
-		return systemManager->registerSystem<T>();
-	}
-	template <typename T>
-	void setSystemSignature(Signature signature) {
-		systemManager->setSignature<T>(signature);
-	}
-};
+#include "coordinator.inl"
 ```
 
 ## Ngon, có ECS rồi, giờ xài sao?
